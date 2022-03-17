@@ -8,13 +8,17 @@ $(document).ready(() => {
 
   window.codeMirrorEditor = window.CodeMirror.fromTextArea(document.querySelector('#codeMirror'), {
     mode: "htmlmixed",
-    lineNumbers: true
+    lineNumbers: true,
   });
+  window.codeMirrorEditor.on('change', function() {
+    $('#preview').contents().find('body').html(window.codeMirrorEditor.getValue())
+  })
 
   $.get(`/get-template/${templateName}?region=${localStorage.getItem('region')}`, function (response) {
     $('#templateName').val(response.data.TemplateName);
     $('#templateSubject').val(response.data.SubjectPart);
     $('#templateText').val(response.data.TextPart);
+    $('#preview').contents().find('body').html(response.data.HtmlPart)
 
     window.codeMirrorEditor.setValue(response.data.HtmlPart ? response.data.HtmlPart : "");
 
