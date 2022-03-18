@@ -8,6 +8,9 @@ $(document).ready(function(){
     mode: "htmlmixed",
     lineNumbers: true
   });
+  window.codeMirrorEditor.on('change', function() {
+    $('#preview').contents().find('body').html(window.codeMirrorEditor.getValue())
+  })
 
   if (urlParams.has('d-origin')) {
     // we need to load the existing template from which we will duplicate
@@ -16,7 +19,7 @@ $(document).ready(function(){
       $('#templateSubject').val(response.data.SubjectPart);
       $('#templateText').val(response.data.TextPart);
       window.codeMirrorEditor.setValue(response.data.HtmlPart ? response.data.HtmlPart : "");
-      $('#preview').html(response.data.HtmlPart)
+      $('#preview').contents().find('body').html(response.data.HtmlPart)
       $('#createTemplateForm').trigger('change'); //enable the save button
     });
   }
