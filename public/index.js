@@ -155,7 +155,18 @@ function sendEmailSubmission(e, form){
   if(dynamicFieldsEl.length > 0) {
     // take into consideration dynamic fields in the payload
     dynamicFieldsEl.forEach((el) => {
-      dynamicFieldPayload[el.name] = el.value;
+      const name = el.name.split('.');
+      if (name.length > 0) {
+        name.reduce((v, n, i) => {
+          v[n] = v[n] || {};
+          if (i+1 === name.length) {
+            v[n] = el.value;
+          }
+          return v[n];
+        }, dynamicFieldPayload)
+      } else {
+        dynamicFieldPayload[el.name] = el.value;
+      }
     });
   }
 

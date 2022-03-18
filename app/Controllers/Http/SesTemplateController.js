@@ -180,6 +180,7 @@ class SesTemplateController {
       },
       Source: requestBody.source, /* required */
       Template: requestBody.templateName, /* required */
+      ConfigurationSetName: "",
       TemplateData: requestBody.templateData, /* required */
     };
 
@@ -188,6 +189,7 @@ class SesTemplateController {
 
     await new Promise((resolve, reject) => {
       ses.sendTemplatedEmail(params, function(err, data) {
+        console.log(params)
         if (err) {
           // an error occurred
           console.log(err, err.stack);
