@@ -6,6 +6,51 @@ AWS.config.credentials = credentials;
 
 class SesTemplateController {
 
+  async downloadTemplate({request, response}) {
+    const requestParams = request.params;
+    const requestQueryParams = request.get();
+
+    AWS.config.update({region: requestQueryParams.region});
+    const ses = new AWS.SES();
+
+    const params = {
+      TemplateName: requestParams.TemplateName
+    };
+
+    await new Promise((resolve, reject) => {
+      ses.getTemplate(params, function (err, data) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    }).then(data => {
+      response.status(200);
+
+      // get dynamic fields to return to the FE
+      const {SubjectPart, HtmlPart} = data.Template;
+      const res = `
+        <html>
+          <head>
+            <title>${SubjectPart}</title>
+          </head>
+          <body>
+            ${HtmlPart}
+          </body>
+        </html>
+      `
+
+      response.header("Content-Disposition", `attachment; filename="${requestParams.TemplateName || 'template'}.html"`)
+      response.header('Content-Type', 'text/html; charset=utf-8')
+      response.header('Content-Length', res.length)
+      response.send(res);
+    }).catch(err => {
+      response.status(500);
+      response.send(err);
+    });
+  }
+
   getDynamicFields(contentStr) {
     // a helper function which will convert a string into an array of any mustache dynamic fields
     let dynamicFieldsArr = [];
